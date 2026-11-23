@@ -1,32 +1,61 @@
-# React + TypeScript + Vite
+# React Task Board
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A task management board built with **React and TypeScript**.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Create new tasks
+- Edit existing tasks
+- Delete tasks
+- Move tasks between To Do, In Progress, and Done
+- Search tasks by title
+- Filter tasks by status
+- Sort tasks by creation date
+- Save tasks using browser local storage
+- Display loading, empty, and error states
+- Reusable components with TypeScript props
 
-## React Compiler
+## Technologies Used
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- TypeScript
+- CSS
+- React Hooks
+- Browser Local Storage
 
-## Expanding the Oxlint configuration
+## Getting Started
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+1. Clone this repository:
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+   ```bash
+   git clone https://github.com/sai-sreeja-a/react-task-board.git
+   ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+2. Navigate to the project folder:
+
+   ```bash
+   cd react-task-board/set-03-react-basics
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. Start the development server using the command configured in `package.json`.
+
+## What I Practiced
+
+- React state management
+- TypeScript interfaces and types
+- Props and component composition
+- Custom hooks
+- Derived state with `useMemo`
+- Local storage persistence
+- Conditional rendering
+- Reusable UI components
+
+---
+
+Built as part of my React and TypeScript learning journey.
