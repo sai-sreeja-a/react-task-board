@@ -3,8 +3,8 @@ import type { Task, TaskStatus } from "../types/task";
 interface TaskCardProps {
   task: Task;
   onEdit: (task: Task) => void;
-  onDelete: (id: string) => void;
-  onMove: (id: string, status: TaskStatus) => void;
+  onDelete: (id: number) => void;
+onMove: (id: number, status: TaskStatus) => void;
 }
 
 // Keep these declarations outside the component

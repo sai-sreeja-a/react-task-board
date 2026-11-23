@@ -6,8 +6,8 @@ interface TaskColumnProps {
   title: string;
   tasks: Task[];
   onEdit: (task: Task) => void;
-  onDelete: (id: string) => void;
-  onMove: (id: string, status: TaskStatus) => void;
+  onDelete: (id: number) => void;
+onMove: (id: number, status: TaskStatus) => void;
   loading: boolean;
   error?: string;
 }
