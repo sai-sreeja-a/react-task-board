@@ -1,4 +1,3 @@
-
 import { z } from "zod";
 
 const taskStatusSchema = z.enum([
@@ -9,6 +8,7 @@ const taskStatusSchema = z.enum([
 
 // Validation when creating a task
 export const createTaskSchema = z.object({
+projectId: z.number().int().positive(),
   title: z.string()
     .trim()
     .min(1, "Title is required")

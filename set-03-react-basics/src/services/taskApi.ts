@@ -47,18 +47,22 @@ export const getTasks = async (
 
   return await response.json();
 };
-
 // CREATE TASK
 export const createTask = async (
   title: string,
-  description: string
+  description: string,
+  projectId: number = 1
 ): Promise<Task> => {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ title, description }),
+    body: JSON.stringify({
+      projectId,
+      title,
+      description,
+    }),
   });
 
   if (!response.ok) {
@@ -69,7 +73,6 @@ export const createTask = async (
 
   return result.data;
 };
-
 // UPDATE TASK
 export const updateTask = async (
   id: number,

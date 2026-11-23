@@ -1,136 +1,122 @@
-# Task Board Application
+# React Task Board
 
-A full-stack Task Board application built using React, TypeScript, Node.js, Express.js, and MongoDB. It allows users to create, manage, update, delete, search, filter, and organize tasks across different statuses.
+A full-stack task management application built with React, TypeScript, Node.js, Express.js, and PostgreSQL.
 
 ## Features
 
-### Frontend
-- Create new tasks.
-- Edit existing tasks.
-- Delete tasks.
-- Move tasks between To Do, In Progress, and Done.
-- Search tasks by title.
-- Filter tasks by status.
-- Sort tasks by newest or oldest.
-- Pagination for task lists.
-- Responsive task board interface.
-
-### Backend
-- RESTful API using Node.js and Express.js.
-- Complete CRUD operations.
-- Request validation using Zod.
-- Consistent error responses.
-- Centralized error-handling middleware.
-- Request-logging middleware.
-- Pagination, filtering, sorting, and title search.
-- MongoDB Atlas integration for persistent data storage.
-
-### Automated Testing
-- Jest and Supertest.
-- Tests for API endpoints.
-- Validation and failure-case testing.
+- Create, edit, delete, and manage tasks
+- Move tasks between To Do, In Progress, and Done
+- Search tasks by title
+- Filter tasks by status
+- Sort tasks by creation date
+- Persist frontend tasks using local storage
+- REST API integration
+- Request validation and error handling
+- Pagination, filtering, sorting, and searching
+- PostgreSQL database integration
+- Database migrations and seed scripts
+- Transactional operations and audit logging
+- Automated backend tests
 
 ## Technologies Used
 
-**Frontend**
+### Frontend
 - React
 - TypeScript
-- Vite
 - CSS
+- Vite
 
-**Backend**
+### Backend
 - Node.js
 - Express.js
 - TypeScript
-- MongoDB Atlas
-- Mongoose
-- Zod
-
-**Testing**
 - Jest
 - Supertest
+
+### Database
+- PostgreSQL
+- pg (node-postgres)
+- SQL migrations
 
 ## Project Structure
 
 ```text
-task-board/
-│
+set-03-react-basics/
 ├── public/
 ├── src/
 │   ├── components/
+│   ├── hooks/
 │   ├── services/
-│   │   └── taskApi.ts
-│   ├── types/
-│   └── App.tsx
-│
+│   └── types/
 ├── server/
+│   ├── docs/
+│   ├── migrations/
+│   ├── seeds/
 │   ├── src/
 │   │   ├── config/
 │   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── models/
 │   │   ├── routes/
 │   │   ├── schemas/
+│   │   ├── scripts/
 │   │   ├── services/
-│   │   ├── types/
-│   │   ├── app.ts
-│   │   └── server.ts
-│   │
-│   ├── tests/
-│   ├── package.json
-│   └── jest.config.js
-│
+│   │   └── types/
+│   └── tests/
+├── .gitignore
 ├── package.json
 └── README.md
 ```
 
-## Installation and Setup
+## Getting Started
 
-### Prerequisites
-- Node.js
-- npm
-- MongoDB Atlas account
+### 1. Install Frontend Dependencies
 
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/sai-sreeja-a/react-task-board.git
-```
-
-```bash
-cd react-task-board
-```
-
-### 2. Install Frontend Dependencies
+From the project root:
 
 ```bash
 npm install
 ```
 
-### 3. Install Backend Dependencies
+### 2. Install Backend Dependencies
 
 ```bash
 cd server
 npm install
 ```
 
-### 4. Configure Environment Variables
+### 3. Configure Environment Variables
 
-Create a `.env` file inside the `server` folder.
+Create a `.env` file inside the `server` directory.
 
-Add your MongoDB connection string:
+Configure your local PostgreSQL connection:
 
 ```env
-MONGODB_URI=your_mongodb_connection_string
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=task_tracker_db
+PGUSER=postgres
+PGPASSWORD=your_local_password
+PGTESTDATABASE=task_tracker_test_db
 ```
 
-Replace the placeholder with your own MongoDB Atlas connection string.
+Replace the values with your own local database configuration.
 
-**Note:** Never commit your `.env` file or expose database credentials on GitHub.
+**Important:** Never commit your `.env` file or expose database credentials on GitHub.
 
-### 5. Start the Backend Server
+### 4. Run Database Migrations
 
 From the `server` directory:
+
+```bash
+npm run migrate
+```
+
+### 5. Seed the Database
+
+```bash
+npm run seed
+```
+
+### 6. Start the Backend
 
 ```bash
 npm run dev
@@ -138,9 +124,9 @@ npm run dev
 
 Backend runs at:
 
-`http://localhost:5000`
+http://localhost:5000
 
-### 6. Start the Frontend
+### 7. Start the Frontend
 
 Open another terminal, navigate to the project root, and run:
 
@@ -150,7 +136,7 @@ npm run dev
 
 Frontend runs at:
 
-`http://localhost:5173`
+http://localhost:5173
 
 ## API Endpoints
 
@@ -165,8 +151,6 @@ Base URL: `http://localhost:5000/api/tasks`
 | DELETE | `/api/tasks/:id` | Delete a task |
 
 ### Query Parameters
-
-The task listing endpoint supports:
 
 | Parameter | Description |
 |---|---|
@@ -183,13 +167,32 @@ Example:
 GET /api/tasks?page=1&limit=10&status=todo&sortBy=createdAt&order=desc
 ```
 
-Search example:
+## PostgreSQL Database Features
 
-```text
-GET /api/tasks?search=React
+- Normalized relational database schema
+- Users, projects, tasks, comments, and tags
+- Versioned SQL migrations
+- Seed script generating 100,000 tasks
+- Parameterized SQL queries
+- Database indexes for query optimization
+- Transactional operations and audit logging
+
+## SQL Injection Prevention
+
+Database queries use parameterized SQL statements.
+
+Example:
+
+```ts
+const result = await pool.query(
+  "SELECT * FROM tasks WHERE id = $1",
+  [id]
+);
 ```
 
-## Running Automated Tests
+This keeps user-provided values separate from SQL query structure.
+
+## Automated Testing
 
 Navigate to the server directory:
 
@@ -203,26 +206,43 @@ Run:
 npm test
 ```
 
+The backend tests cover CRUD operations, validation, invalid IDs, pagination, filtering, sorting, and searching.
+
+The previously reported test result was 23 passing tests.
+
 ## Production Build
 
-From the project root:
+From the project root, run:
 
 ```bash
 npm run build
 ```
 
-## Project Status
+For the backend, navigate to `server` and run its configured build script.
 
-- Frontend and backend integration completed.
-- REST API CRUD operations implemented.
-- Request validation and error handling implemented.
-- Pagination, filtering, sorting, and title search implemented.
-- MongoDB Atlas integration completed.
-- Automated backend tests: **23 passing tests**.
-- Production build successful.
+## Project Documentation
 
-## Author
+Additional database documentation is available in `server/docs/`, including:
 
-**Sai Sreeja**
+- Database ERD
+- Database normalization
+- Performance analysis
+- Transaction testing
 
-GitHub: [sai-sreeja-a](https://github.com/sai-sreeja-a)
+## Learning Outcomes
+
+- React state management and hooks
+- TypeScript interfaces and types
+- Reusable component architecture
+- Custom hooks
+- REST API integration
+- Backend development with Express
+- PostgreSQL schema design
+- SQL migrations and query optimization
+- Automated API testing
+
+---
+
+Built as part of my React and TypeScript learning journey.
+
+GitHub: https://github.com/sai-sreeja-a

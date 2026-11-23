@@ -6,7 +6,8 @@ import {
   fetchTasks,
   fetchTaskById,
   editTask,
-  removeTask
+  removeTask,
+  moveTask
 } from "../controllers/taskController";
 
 import { validateRequest } from "../middleware/validateRequest";
@@ -40,5 +41,6 @@ router.put(
 
 // DELETE TASK
 router.delete("/:id", removeTask);
-
+// MOVE TASK TO ANOTHER PROJECT
+router.patch("/:id/move", moveTask);
 export default router;

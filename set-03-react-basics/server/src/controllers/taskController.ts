@@ -6,7 +6,8 @@ import {
   getAllTasks,
   getTaskById,
   updateTask,
-  deleteTask
+  deleteTask,
+  moveTaskToProject
 } from "../services/taskService";
 
 // CREATE TASK
@@ -194,6 +195,52 @@ export const removeTask = async (
 
     return res.status(204).send();
   } catch (error) {
+    next(error);
+  }
+};
+
+// MOVE TASK TO ANOTHER PROJECT
+export const moveTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const taskId = Number(req.params.id);
+    const newProjectId = req.body.newProjectId;
+
+    if (!Number.isInteger(taskId) || taskId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid task ID"
+      });
+    }
+
+    if (
+      !Number.isInteger(newProjectId) ||
+      newProjectId <= 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "A valid newProjectId is required"
+      });
+    }
+
+    const task = await moveTaskToProject(taskId, newProjectId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Task moved successfully",
+      data: task
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "Task not found") {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found"
+      });
+    }
+
     next(error);
   }
 };

@@ -1,19 +1,41 @@
 import "dotenv/config";
 import request from "supertest";
-import mongoose from "mongoose";
 import app from "../src/app";
-import connectDB from "../src/config/db";
-import { resetTasks } from "../src/services/taskService";
+import pool from "../src/config/database";
+let testProjectId: number;
+
 beforeAll(async () => {
-  await connectDB();
+  const userResult = await pool.query(
+    `INSERT INTO users (name, email, password_hash)
+     VALUES ($1, $2, $3)
+     RETURNING id`,
+    ["Test User", "test-user@example.com", "test-password-hash"]
+  );
+
+  const projectResult = await pool.query(
+    `INSERT INTO projects (user_id, name)
+     VALUES ($1, $2)
+     RETURNING id`,
+    [userResult.rows[0].id, "Test Project"]
+  );
+
+  testProjectId = Number(projectResult.rows[0].id);
 });
 
 beforeEach(async () => {
-  await resetTasks();
+  await pool.query(
+    "DELETE FROM tasks WHERE project_id = $1",
+    [testProjectId]
+  );
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
+  await pool.query(
+    "DELETE FROM users WHERE email = $1",
+    ["test-user@example.com"]
+  );
+
+  await pool.end();
 });
 
 describe("Task API Tests", () => {
@@ -31,9 +53,10 @@ describe("Task API Tests", () => {
     const response = await request(app)
       .post("/api/tasks")
       .send({
-        title: "Test task",
-        description: "Testing POST"
-      });
+  projectId: testProjectId,
+  title: "Test task",
+  description: "Testing POST"
+});
 
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
@@ -45,9 +68,10 @@ describe("Task API Tests", () => {
     const response = await request(app)
       .post("/api/tasks")
       .send({
-        title: "",
-        description: "Testing invalid data"
-      });
+  projectId: testProjectId,
+  title: "",
+  description: "Testing invalid data"
+});
 
     expect(response.status).toBe(400);
     expect(response.body.success).toBe(false);
@@ -58,9 +82,10 @@ describe("Task API Tests", () => {
     const created = await request(app)
       .post("/api/tasks")
       .send({
-        title: "Find me",
-        description: "Testing GET by ID"
-      });
+  projectId: testProjectId,
+  title: "Find me",
+  description: "Testing GET by ID"
+});
 
     const id = created.body.data.id;
 
@@ -83,10 +108,10 @@ describe("Task API Tests", () => {
     const created = await request(app)
       .post("/api/tasks")
       .send({
-        title: "Old title",
-        description: "Testing update"
-      });
-
+  projectId: testProjectId,
+  title: "Old title",
+  description: "Testing update"
+});
     const id = created.body.data.id;
 
     const response = await request(app)
@@ -104,10 +129,10 @@ describe("Task API Tests", () => {
     const created = await request(app)
       .post("/api/tasks")
       .send({
-        title: "Test task",
-        description: "Testing invalid update"
-      });
-
+  projectId: testProjectId,
+  title: "Test task",
+  description: "Testing invalid update"
+});
     const id = created.body.data.id;
 
     const response = await request(app)
@@ -123,9 +148,10 @@ describe("Task API Tests", () => {
     const created = await request(app)
       .post("/api/tasks")
       .send({
-        title: "Delete me",
-        description: "Testing DELETE"
-      });
+  projectId: testProjectId,
+  title: "Delete me",
+  description: "Testing DELETE"
+});
 
     const id = created.body.data.id;
 
@@ -141,14 +167,16 @@ describe("Task API Tests", () => {
   // 9. PAGINATION
   test("GET /api/tasks should support pagination", async () => {
     await request(app).post("/api/tasks").send({
-      title: "Task 1",
-      description: "First task"
-    });
+  projectId: testProjectId,
+  title: "Task 1",
+  description: "First task"
+});
 
-    await request(app).post("/api/tasks").send({
-      title: "Task 2",
-      description: "Second task"
-    });
+   await request(app).post("/api/tasks").send({
+  projectId: testProjectId,
+  title: "Task 2",
+  description: "Second task"
+});
 
     const response = await request(app)
       .get("/api/tasks?page=1&limit=1");
@@ -162,10 +190,11 @@ describe("Task API Tests", () => {
   // 10. FILTER BY STATUS
   test("GET /api/tasks should filter tasks by status", async () => {
     await request(app).post("/api/tasks").send({
-      title: "Completed task",
-      description: "Testing filter",
-      status: "done"
-    });
+  projectId: testProjectId,
+  title: "Completed task",
+  description: "Testing filter",
+  status: "done"
+});
 
     const response = await request(app)
       .get("/api/tasks?status=done");
@@ -178,14 +207,16 @@ describe("Task API Tests", () => {
   // 11. SORTING
   test("GET /api/tasks should sort tasks by title", async () => {
     await request(app).post("/api/tasks").send({
-      title: "Zebra",
-      description: "Last alphabetically"
-    });
+  projectId: testProjectId,
+  title: "Zebra",
+  description: "Last alphabetically"
+});
 
     await request(app).post("/api/tasks").send({
-      title: "Apple",
-      description: "First alphabetically"
-    });
+  projectId: testProjectId,
+  title: "Apple",
+  description: "First alphabetically"
+});
 
     const response = await request(app)
       .get("/api/tasks?sortBy=title&order=asc");
@@ -261,11 +292,12 @@ describe("Task API Tests", () => {
   test("POST /api/tasks should reject an invalid status", async () => {
     const response = await request(app)
       .post("/api/tasks")
-      .send({
-        title: "Invalid status",
-        description: "Testing status",
-        status: "pending"
-      });
+     .send({
+  projectId: testProjectId,
+  title: "Invalid status",
+  description: "Testing status",
+  status: "pending"
+});
 
     expect(response.status).toBe(400);
     expect(response.body.message).toBe("Validation failed");
@@ -275,10 +307,11 @@ describe("Task API Tests", () => {
   test("PUT /api/tasks/:id should reject an invalid status", async () => {
   const created = await request(app)
     .post("/api/tasks")
-    .send({
-      title: "Test task",
-      description: "Testing invalid status",
-    });
+   .send({
+  projectId: testProjectId,
+  title: "Test task",
+  description: "Testing invalid status",
+});
 
   const response = await request(app)
     .put(`/api/tasks/${created.body.data.id}`)
@@ -290,15 +323,16 @@ describe("Task API Tests", () => {
 });
   // 23. SEARCH TASKS
   test("GET /api/tasks should search tasks by title", async () => {
+await request(app).post("/api/tasks").send({
+  projectId: testProjectId,
+  title: "React Task Board",
+  description: "Testing search"
+});
     await request(app).post("/api/tasks").send({
-      title: "React Task Board",
-      description: "Testing search"
-    });
-
-    await request(app).post("/api/tasks").send({
-      title: "Shopping List",
-      description: "Another task"
-    });
+  projectId: testProjectId,
+  title: "Shopping List",
+  description: "Another task"
+});
 
     const response = await request(app)
       .get("/api/tasks?search=react");
@@ -313,9 +347,10 @@ describe("Task API Tests", () => {
     const response = await request(app)
       .post("/api/tasks")
       .send({
-        title: "Extra field",
-        priority: "high"
-      });
+  projectId: testProjectId,
+  title: "Extra field",
+  priority: "high"
+});
 
     expect(response.status).toBe(400);
     expect(response.body.message).toBe("Validation failed");
@@ -326,9 +361,10 @@ describe("Task API Tests", () => {
   const created = await request(app)
     .post("/api/tasks")
     .send({
-      title: "Test task",
-      description: "Testing unexpected fields",
-    });
+  projectId: testProjectId,
+  title: "Test task",
+  description: "Testing unexpected fields",
+});
 
   const response = await request(app)
     .put(`/api/tasks/${created.body.data.id}`)
