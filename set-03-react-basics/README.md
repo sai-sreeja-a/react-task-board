@@ -1,27 +1,29 @@
 # React Task Board
 
-A full-stack task management application built with React, TypeScript, Node.js, Express.js, and PostgreSQL.
+A full-stack task management application built with **React, TypeScript, Node.js, Express.js, and PostgreSQL**. The application provides task management, project organization, REST API integration, database migrations, and automated backend testing.
 
 ## Features
 
 - Create, edit, delete, and manage tasks
-- Move tasks between To Do, In Progress, and Done
+- Move tasks between projects
+- Manage task statuses: To Do, In Progress, and Done
 - Search tasks by title
 - Filter tasks by status
 - Sort tasks by creation date
 - Persist frontend tasks using local storage
 - REST API integration
-- Request validation and error handling
+- Request validation and centralized error handling
 - Pagination, filtering, sorting, and searching
 - PostgreSQL database integration
 - Database migrations and seed scripts
-- Transactional operations and audit logging
+- Transactional database operations
+- Audit logging
 - Automated backend tests
 
 ## Technologies Used
 
 ### Frontend
-- React
+- React 19
 - TypeScript
 - CSS
 - Vite
@@ -30,6 +32,7 @@ A full-stack task management application built with React, TypeScript, Node.js, 
 - Node.js
 - Express.js
 - TypeScript
+- Zod
 - Jest
 - Supertest
 
@@ -55,6 +58,7 @@ set-03-react-basics/
 │   ├── src/
 │   │   ├── config/
 │   │   ├── controllers/
+│   │   ├── middleware/
 │   │   ├── routes/
 │   │   ├── schemas/
 │   │   ├── scripts/
@@ -68,7 +72,22 @@ set-03-react-basics/
 
 ## Getting Started
 
-### 1. Install Frontend Dependencies
+### Prerequisites
+
+Make sure you have the following installed:
+
+- Node.js and npm
+- PostgreSQL
+- Git
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/sai-sreeja-a/react-task-board.git
+cd react-task-board
+```
+
+### 2. Install Frontend Dependencies
 
 From the project root:
 
@@ -76,18 +95,18 @@ From the project root:
 npm install
 ```
 
-### 2. Install Backend Dependencies
+### 3. Install Backend Dependencies
 
 ```bash
 cd server
 npm install
 ```
 
-### 3. Configure Environment Variables
+### 4. Configure Environment Variables
 
 Create a `.env` file inside the `server` directory.
 
-Configure your local PostgreSQL connection:
+Add your local PostgreSQL configuration:
 
 ```env
 PGHOST=localhost
@@ -98,11 +117,11 @@ PGPASSWORD=your_local_password
 PGTESTDATABASE=task_tracker_test_db
 ```
 
-Replace the values with your own local database configuration.
+Replace the values with your own PostgreSQL configuration.
 
 **Important:** Never commit your `.env` file or expose database credentials on GitHub.
 
-### 4. Run Database Migrations
+### 5. Run Database Migrations
 
 From the `server` directory:
 
@@ -110,23 +129,23 @@ From the `server` directory:
 npm run migrate
 ```
 
-### 5. Seed the Database
+### 6. Seed the Database
 
 ```bash
 npm run seed
 ```
 
-### 6. Start the Backend
+### 7. Start the Backend
 
 ```bash
 npm run dev
 ```
 
-Backend runs at:
+The backend runs at:
 
-http://localhost:5000
+`http://localhost:5000`
 
-### 7. Start the Frontend
+### 8. Start the Frontend
 
 Open another terminal, navigate to the project root, and run:
 
@@ -134,21 +153,26 @@ Open another terminal, navigate to the project root, and run:
 npm run dev
 ```
 
-Frontend runs at:
+The frontend runs at:
 
-http://localhost:5173
+`http://localhost:5173`
 
-## API Endpoints
+## API Documentation
 
-Base URL: `http://localhost:5000/api/tasks`
+Base URL:
+
+`http://localhost:5000/api/tasks`
+
+### Available Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
 | GET | `/api/tasks` | Retrieve all tasks |
 | GET | `/api/tasks/:id` | Retrieve a task by ID |
 | POST | `/api/tasks` | Create a new task |
-| PUT | `/api/tasks/:id` | Update a task |
+| PUT | `/api/tasks/:id` | Update an existing task |
 | DELETE | `/api/tasks/:id` | Delete a task |
+| PATCH | `/api/tasks/:id/move` | Move a task to another project |
 
 ### Query Parameters
 
@@ -157,9 +181,9 @@ Base URL: `http://localhost:5000/api/tasks`
 | `page` | Page number |
 | `limit` | Number of tasks per page |
 | `status` | Filter by task status |
-| `search` | Search by task title |
-| `sortBy` | Sort by title, createdAt, or updatedAt |
-| `order` | Sort order: asc or desc |
+| `search` | Search tasks by title |
+| `sortBy` | Sort field |
+| `order` | Sort order: `asc` or `desc` |
 
 Example:
 
@@ -169,29 +193,29 @@ GET /api/tasks?page=1&limit=10&status=todo&sortBy=createdAt&order=desc
 
 ## PostgreSQL Database Features
 
-- Normalized relational database schema
+- Relational database schema
 - Users, projects, tasks, comments, and tags
 - Versioned SQL migrations
-- Seed script generating 100,000 tasks
+- Database seed scripts
 - Parameterized SQL queries
 - Database indexes for query optimization
-- Transactional operations and audit logging
+- Transactional operations
+- Audit logging
 
 ## SQL Injection Prevention
 
-Database queries use parameterized SQL statements.
+Database queries use parameterized SQL statements to help prevent SQL injection attacks.
 
 **Unsafe example (do not use):**
 
 ```ts
-// Directly inserting user input into SQL is dangerous
 const query = `SELECT * FROM tasks WHERE id = ${id}`;
 const result = await pool.query(query);
 ```
 
-An attacker could manipulate the SQL query by providing malicious input instead of a normal task ID.
+Directly inserting user input into SQL queries can allow malicious input to alter the query.
 
-**Safe example (recommended):**
+**Safe example:**
 
 ```ts
 const result = await pool.query(
@@ -200,37 +224,39 @@ const result = await pool.query(
 );
 ```
 
-This keeps user-provided values separate from SQL query structure and helps prevent SQL injection attacks.
-
-Always use parameterized queries when working with user-provided values.
+Parameterized queries keep user-provided values separate from SQL query structure.
 
 ## Automated Testing
 
-Navigate to the server directory:
+Backend tests use Jest and Supertest.
 
-```bash
-cd server
-```
-
-Run:
+From the `server` directory, run:
 
 ```bash
 npm test
 ```
 
-The backend tests cover CRUD operations, validation, invalid IDs, pagination, filtering, sorting, and searching.
-
-The previously reported test result was 23 passing tests.
+The backend tests cover CRUD operations, request validation, invalid IDs, pagination, filtering, sorting, and searching.
 
 ## Production Build
 
-From the project root, run:
+### Frontend
+
+From the project root:
 
 ```bash
 npm run build
 ```
 
-For the backend, navigate to `server` and run its configured build script.
+This runs the TypeScript build and creates the production frontend bundle using Vite.
+
+### Backend
+
+From the `server` directory:
+
+```bash
+npm run build
+```
 
 ## Project Documentation
 
@@ -251,10 +277,13 @@ Additional database documentation is available in `server/docs/`, including:
 - Backend development with Express
 - PostgreSQL schema design
 - SQL migrations and query optimization
+- Database transaction management
 - Automated API testing
 
 ---
 
 Built as part of my React and TypeScript learning journey.
 
-GitHub: https://github.com/sai-sreeja-a
+**GitHub:** https://github.com/sai-sreeja-a
+
+**Repository:** https://github.com/sai-sreeja-a/react-task-board
