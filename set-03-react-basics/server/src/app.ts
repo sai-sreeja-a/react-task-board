@@ -6,14 +6,6 @@ import taskRoutes from "./routes/taskRoutes";
 
 const app = express();
 
-// Request logging middleware
-app.use((req, res, next) => {
-  console.log(
-    `${new Date().toISOString()} - ${req.method} ${req.originalUrl}`
-  );
-  next();
-});
-
 // General middleware
 app.use(cors());
 app.use(express.json());
