@@ -181,7 +181,17 @@ GET /api/tasks?page=1&limit=10&status=todo&sortBy=createdAt&order=desc
 
 Database queries use parameterized SQL statements.
 
-Example:
+**Unsafe example (do not use):**
+
+```ts
+// Directly inserting user input into SQL is dangerous
+const query = `SELECT * FROM tasks WHERE id = ${id}`;
+const result = await pool.query(query);
+```
+
+An attacker could manipulate the SQL query by providing malicious input instead of a normal task ID.
+
+**Safe example (recommended):**
 
 ```ts
 const result = await pool.query(
@@ -190,7 +200,9 @@ const result = await pool.query(
 );
 ```
 
-This keeps user-provided values separate from SQL query structure.
+This keeps user-provided values separate from SQL query structure and helps prevent SQL injection attacks.
+
+Always use parameterized queries when working with user-provided values.
 
 ## Automated Testing
 
