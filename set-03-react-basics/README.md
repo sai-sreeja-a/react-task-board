@@ -1,22 +1,45 @@
 # React Task Board
 
-A full-stack task management application built with **React, TypeScript, Node.js, Express.js, and PostgreSQL**. The application provides task management, project organization, REST API integration, database migrations, and automated backend testing.
+A full-stack task management application built with **React, TypeScript, Node.js, Express.js, and PostgreSQL**. The application provides task management, project organization, user authentication, role-based access control, REST API integration, database migrations, and automated backend testing.
 
 ## Features
 
+### Task Management
 - Create, edit, delete, and manage tasks
 - Move tasks between projects
 - Manage task statuses: To Do, In Progress, and Done
 - Search tasks by title
 - Filter tasks by status
 - Sort tasks by creation date
-- Persist frontend tasks using local storage
+- Pagination, filtering, sorting, and searching
+
+### Authentication and Security
+- User registration and login
+- Secure password hashing using bcrypt
+- Session-based authentication using HTTP-only cookies
+- User logout and session revocation
+- Protected API routes
+- Forgot-password and password-reset functionality
+- Password reset tokens with expiration
+- Login and password-reset rate limiting
+- Password validation, including bcrypt's 72-byte limit
+- Cross-user data access protection
+
+### Project Authorization
+- Project membership management
+- Role-based access control
+- Owner, member, and viewer roles
+- Server-side permission enforcement
+- Viewers cannot modify tasks
+- Users cannot access another user's protected project data
+
+### Backend and Database
 - REST API integration
 - Request validation and centralized error handling
-- Pagination, filtering, sorting, and searching
 - PostgreSQL database integration
 - Database migrations and seed scripts
 - Transactional database operations
+- Parameterized SQL queries
 - Audit logging
 - Automated backend tests
 
@@ -33,6 +56,9 @@ A full-stack task management application built with **React, TypeScript, Node.js
 - Express.js
 - TypeScript
 - Zod
+- bcryptjs
+- express-rate-limit
+- cookie-parser
 - Jest
 - Supertest
 
@@ -153,26 +179,39 @@ Open another terminal, navigate to the project root, and run:
 npm run dev
 ```
 
-The frontend runs at:
-
-`http://localhost:5173`
+Vite displays the frontend's local URL in the terminal.
 
 ## API Documentation
 
 Base URL:
 
-`http://localhost:5000/api/tasks`
+`http://localhost:5000/api`
 
-### Available Endpoints
+### Authentication Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/api/tasks` | Retrieve all tasks |
-| GET | `/api/tasks/:id` | Retrieve a task by ID |
-| POST | `/api/tasks` | Create a new task |
-| PUT | `/api/tasks/:id` | Update an existing task |
-| DELETE | `/api/tasks/:id` | Delete a task |
-| PATCH | `/api/tasks/:id/move` | Move a task to another project |
+| POST | `/auth/signup` | Register a new user |
+| POST | `/auth/login` | Authenticate a user |
+| POST | `/auth/logout` | Log out and revoke the session |
+| GET | `/auth/me` | Retrieve the authenticated user |
+| POST | `/auth/forgot-password` | Request a password reset |
+| POST | `/auth/reset-password` | Reset a password using a valid token |
+
+Authentication uses HTTP-only session cookies. Protected endpoints require a valid session.
+
+**Password reset note:** In the current development implementation, the reset link is logged to the server console. Production email delivery requires an email provider integration.
+
+### Task Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/tasks` | Retrieve tasks |
+| GET | `/tasks/:id` | Retrieve a task by ID |
+| POST | `/tasks` | Create a new task |
+| PUT | `/tasks/:id` | Update an existing task |
+| DELETE | `/tasks/:id` | Delete a task |
+| PATCH | `/tasks/:id/move` | Move a task to another project |
 
 ### Query Parameters
 
@@ -191,10 +230,44 @@ Example:
 GET /api/tasks?page=1&limit=10&status=todo&sortBy=createdAt&order=desc
 ```
 
+## Authentication and Authorization
+
+### Password Security
+- Passwords are hashed using bcrypt before database storage.
+- Passwords are never stored as plain text.
+- Passwords must contain at least 8 characters.
+- Passwords are limited to 72 bytes to respect bcrypt's input limit.
+
+### Session Security
+- Authentication uses randomly generated session tokens.
+- Session tokens are stored as SHA-256 hashes in the database.
+- Sessions have expiration dates.
+- HTTP-only cookies help protect session tokens from JavaScript access.
+- Logging out revokes the current session.
+- Password resets revoke existing user sessions.
+
+### Role-Based Access Control
+
+The application supports three project roles:
+
+| Role | Permissions |
+|---|---|
+| Owner | Full project management permissions |
+| Member | Project access and permitted task operations |
+| Viewer | Read-only access |
+
+Permissions are enforced on the backend, not just through frontend controls.
+
+### Rate Limiting
+- Login attempts are limited to help prevent brute-force attacks.
+- Password-reset requests are rate limited.
+- Password-reset responses avoid revealing whether an email address is registered.
+
 ## PostgreSQL Database Features
 
 - Relational database schema
-- Users, projects, tasks, comments, and tags
+- Users, projects, project memberships, tasks, comments, and tags
+- User sessions and password-reset tokens
 - Versioned SQL migrations
 - Database seed scripts
 - Parameterized SQL queries
@@ -236,7 +309,32 @@ From the `server` directory, run:
 npm test
 ```
 
-The backend tests cover CRUD operations, request validation, invalid IDs, pagination, filtering, sorting, and searching.
+The backend currently has **34 passing automated tests** across two test suites.
+
+### Task API Tests
+- Task CRUD operations
+- Request validation
+- Invalid IDs
+- Pagination, filtering, and sorting
+- Cross-user access protection
+- Viewer permission enforcement
+- Expired-session protection
+
+### Authentication API Tests
+- User registration
+- Duplicate-email rejection
+- Invalid signup input
+- Password length validation
+- Login and incorrect credentials
+- Logout and session revocation
+- Forgot-password response privacy
+- Password reset and session revocation
+
+### Test Results
+
+- Authentication tests: 8 passed
+- Task API tests: 26 passed
+- Total: 34 passed
 
 ## Production Build
 
@@ -258,6 +356,8 @@ From the `server` directory:
 npm run build
 ```
 
+This compiles the backend TypeScript code.
+
 ## Project Documentation
 
 Additional database documentation is available in `server/docs/`, including:
@@ -275,10 +375,13 @@ Additional database documentation is available in `server/docs/`, including:
 - Custom hooks
 - REST API integration
 - Backend development with Express
+- User authentication and session management
+- Password security and rate limiting
+- Role-based access control
 - PostgreSQL schema design
 - SQL migrations and query optimization
 - Database transaction management
-- Automated API testing
+- Automated API and security testing
 
 ---
 
