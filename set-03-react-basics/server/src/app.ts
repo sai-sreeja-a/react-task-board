@@ -1,14 +1,25 @@
 
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import taskRoutes from "./routes/taskRoutes";
+import authRoutes from "./routes/authRoutes";
+import projectRoutes from "./routes/projectRoutes";
 
 const app = express();
 
+// CORS configuration
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true
+  })
+);
+
 // General middleware
-app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Welcome route
 app.get("/", (req, res) => {
@@ -17,6 +28,12 @@ app.get("/", (req, res) => {
     message: "Task Board API is running successfully!"
   });
 });
+
+// Authentication routes
+app.use("/api/auth", authRoutes);
+
+// Project routes
+app.use("/api/projects", projectRoutes);
 
 // Task routes
 app.use("/api/tasks", taskRoutes);
@@ -30,13 +47,20 @@ app.use((req, res) => {
 });
 
 // Central error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err);
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error(err);
 
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal server error"
-  });
-});
+    res.status(err.status || 500).json({
+      success: false,
+      message: err.message || "Internal server error"
+    });
+  }
+);
 
 export default app;

@@ -2,12 +2,22 @@
 import type { Task, TaskStatus } from "../types/task";
 
 const API_URL = "http://localhost:5000/api/tasks";
+const fetchWithCredentials = (
+  url: string,
+  options: RequestInit = {}
+) => {
+  return fetch(url, {
+    ...options,
+    credentials: "include",
+  });
+};
 
 // GET ALL TASKS WITH SERVER-SIDE FILTERING AND PAGINATION
 
 export interface GetTasksParams {
   page: number;
   limit: number;
+  projectId?: number;
   status?: TaskStatus | "all";
   search?: string;
   sortOrder: "newest" | "oldest";
@@ -30,7 +40,9 @@ export const getTasks = async (
     sortBy: "createdAt",
     order: params.sortOrder === "newest" ? "desc" : "asc",
   });
-
+if (params.projectId !== undefined) {
+  queryParams.set("projectId", String(params.projectId));
+}
     if (params.status && params.status !== "all") {
     queryParams.set("status", params.status);
   }
@@ -39,7 +51,7 @@ export const getTasks = async (
     queryParams.set("search", params.search.trim());
   }
 
-  const response = await fetch(`${API_URL}?${queryParams.toString()}`);
+  const response = await fetchWithCredentials(`${API_URL}?${queryParams.toString()}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch tasks");
@@ -48,12 +60,13 @@ export const getTasks = async (
   return await response.json();
 };
 // CREATE TASK
+
 export const createTask = async (
   title: string,
   description: string,
-  projectId: number = 1
+  projectId: number
 ): Promise<Task> => {
-  const response = await fetch(API_URL, {
+  const response = await fetchWithCredentials(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -65,11 +78,11 @@ export const createTask = async (
     }),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to create task");
-  }
-
   const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to create task");
+  }
 
   return result.data;
 };
@@ -79,7 +92,7 @@ export const updateTask = async (
   title: string,
   description: string
 ): Promise<Task> => {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await fetchWithCredentials(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -98,7 +111,7 @@ export const updateTask = async (
 
 // DELETE TASK
 export const deleteTask = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await fetchWithCredentials(`${API_URL}/${id}`, {
     method: "DELETE",
   });
 
@@ -112,7 +125,7 @@ export const moveTask = async (
   id: number,
   status: TaskStatus
 ): Promise<Task> => {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await fetchWithCredentials(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

@@ -11,6 +11,7 @@ import {
 } from "../controllers/taskController";
 
 import { validateRequest } from "../middleware/validateRequest";
+import { requireAuth } from "../middleware/authMiddleware";
 
 import {
   createTaskSchema,
@@ -19,12 +20,11 @@ import {
 
 const router = Router();
 
+// All task endpoints require authentication
+router.use(requireAuth);
+
 // CREATE TASK
-router.post(
-  "/",
-  validateRequest(createTaskSchema),
-  addTask
-);
+router.post("/", validateRequest(createTaskSchema), addTask);
 
 // GET ALL TASKS
 router.get("/", fetchTasks);
@@ -33,14 +33,12 @@ router.get("/", fetchTasks);
 router.get("/:id", fetchTaskById);
 
 // UPDATE TASK
-router.put(
-  "/:id",
-  validateRequest(updateTaskSchema),
-  editTask
-);
+router.put("/:id", validateRequest(updateTaskSchema), editTask);
 
 // DELETE TASK
 router.delete("/:id", removeTask);
+
 // MOVE TASK TO ANOTHER PROJECT
 router.patch("/:id/move", moveTask);
+
 export default router;

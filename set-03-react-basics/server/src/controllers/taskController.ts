@@ -17,7 +17,8 @@ export const addTask = async (
   next: NextFunction
 ) => {
   try {
-    const task = await createTask(req.body);
+    const userId = res.locals.userId;
+    const task = await createTask(req.body, userId);
 
     return res.status(201).json({
       success: true,
@@ -36,13 +37,20 @@ export const fetchTasks = async (
   next: NextFunction
 ) => {
   try {
+    const userId = res.locals.userId;
+
     const page = Number(req.query.page ?? 1);
     const limit = Number(req.query.limit ?? 10);
 
-   const status = req.query.status;
-   const search = req.query.search;
-const sortBy = req.query.sortBy ?? "createdAt";
-const order = req.query.order ?? "desc";
+    const status = req.query.status;
+    const projectId =
+  req.query.projectId !== undefined
+    ? Number(req.query.projectId)
+    : undefined;
+    const search = req.query.search;
+    const sortBy = req.query.sortBy ?? "createdAt";
+    const order = req.query.order ?? "desc";
+
     if (
       !Number.isInteger(page) ||
       page < 1 ||
@@ -50,6 +58,15 @@ const order = req.query.order ?? "desc";
       limit < 1 ||
       limit > 100
     ) {
+      if (
+  projectId !== undefined &&
+  (!Number.isInteger(projectId) || projectId <= 0)
+) {
+  return res.status(400).json({
+    success: false,
+    message: "Invalid project ID"
+  });
+}
       return res.status(400).json({
         success: false,
         message: "Page must be positive and limit must be between 1 and 100"
@@ -82,14 +99,19 @@ const order = req.query.order ?? "desc";
       });
     }
 
-   const result = await getAllTasks({
+    const result = await getAllTasks(
+      {
   page,
   limit,
+  projectId,
   status: status ? String(status) : undefined,
   search: search ? String(search) : undefined,
-  sortBy: sortBy as "title" | "createdAt" | "updatedAt",
-  order: order as "asc" | "desc"
-});
+        sortBy: sortBy as "title" | "createdAt" | "updatedAt",
+        order: order as "asc" | "desc"
+      },
+      userId
+    );
+
     return res.status(200).json({
       success: true,
       ...result
@@ -106,6 +128,7 @@ export const fetchTaskById = async (
   next: NextFunction
 ) => {
   try {
+    const userId = res.locals.userId;
     const id = Number(req.params.id);
 
     if (!Number.isInteger(id) || id <= 0) {
@@ -115,7 +138,7 @@ export const fetchTaskById = async (
       });
     }
 
-    const task = await getTaskById(id);
+    const task = await getTaskById(id, userId);
 
     if (!task) {
       return res.status(404).json({
@@ -140,6 +163,7 @@ export const editTask = async (
   next: NextFunction
 ) => {
   try {
+    const userId = res.locals.userId;
     const id = Number(req.params.id);
 
     if (!Number.isInteger(id) || id <= 0) {
@@ -149,7 +173,7 @@ export const editTask = async (
       });
     }
 
-    const task = await updateTask(id, req.body);
+    const task = await updateTask(id, req.body, userId);
 
     if (!task) {
       return res.status(404).json({
@@ -175,6 +199,7 @@ export const removeTask = async (
   next: NextFunction
 ) => {
   try {
+    const userId = res.locals.userId;
     const id = Number(req.params.id);
 
     if (!Number.isInteger(id) || id <= 0) {
@@ -184,7 +209,7 @@ export const removeTask = async (
       });
     }
 
-    const deleted = await deleteTask(id);
+    const deleted = await deleteTask(id, userId);
 
     if (!deleted) {
       return res.status(404).json({
@@ -206,6 +231,7 @@ export const moveTask = async (
   next: NextFunction
 ) => {
   try {
+    const userId = res.locals.userId;
     const taskId = Number(req.params.id);
     const newProjectId = req.body.newProjectId;
 
@@ -226,7 +252,11 @@ export const moveTask = async (
       });
     }
 
-    const task = await moveTaskToProject(taskId, newProjectId);
+    const task = await moveTaskToProject(
+      taskId,
+      newProjectId,
+      userId
+    );
 
     return res.status(200).json({
       success: true,
@@ -234,13 +264,6 @@ export const moveTask = async (
       data: task
     });
   } catch (error) {
-    if (error instanceof Error && error.message === "Task not found") {
-      return res.status(404).json({
-        success: false,
-        message: "Task not found"
-      });
-    }
-
     next(error);
   }
 };
