@@ -26,17 +26,18 @@ export const signup = async (
   try {
     const { name, email, password } = req.body;
 
-    if (
+       if (
       typeof name !== "string" ||
       typeof email !== "string" ||
       typeof password !== "string" ||
       !name.trim() ||
       !email.trim() ||
-      password.length < 8
+      password.length < 8 ||
+      Buffer.byteLength(password, "utf8") > 72
     ) {
       res.status(400).json({
         success: false,
-        message: "Name, valid email and password of at least 8 characters are required"
+        message: "Name, valid email and password between 8 characters and 72 bytes are required"
       });
       return;
     }
