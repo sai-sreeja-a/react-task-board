@@ -43,11 +43,92 @@ A full-stack task management application built with **React, TypeScript, Node.js
 - Audit logging
 - Automated backend tests
 
+## Current Application Architecture
+
+The repository contains the original React + Vite frontend, a newer Next.js frontend, and the Express.js backend.
+
+The current Task Board frontend is being developed in the `next-app/` directory.
+
+### Next.js Frontend
+
+The Next.js application is built using:
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS
+- PostgreSQL integration
+
+The frontend provides authentication, project management, task management, and user settings.
+
+### Next.js Application Routes
+
+| Route | Description |
+|---|---|
+| `/` | Home page |
+| `/login` | User login |
+| `/signup` | User registration |
+| `/projects` | View projects |
+| `/projects/new` | Create a project |
+| `/projects/[projectId]` | View project details |
+| `/projects/[projectId]/tasks/new` | Create a task |
+| `/tasks/[taskId]` | View task details |
+| `/settings` | User settings |
+
+### Frontend Development
+
+Navigate to the Next.js application:
+
+```bash
+cd next-app
+npm install
+npm run dev
+```
+
+The development server displays the local URL in the terminal.
+
+### Frontend TypeScript Validation
+
+```bash
+npx tsc --noEmit
+```
+
+### Frontend Production Build
+
+```bash
+npm run build
+```
+
+### Start the Production Server
+
+```bash
+npm run start
+```
+
+### Original React + Vite Frontend
+
+The repository also contains the original React + Vite frontend at the project root.
+
+It uses React, TypeScript, and Vite.
+
+The root-level frontend can be started using:
+
+```bash
+npm install
+npm run dev
+```
+
+The original Vite frontend is retained separately from the newer Next.js application.
+
+
 ## Technologies Used
+
 
 ### Frontend
 - React 19
+- Next.js 16
 - TypeScript
+- Tailwind CSS
 - CSS
 - Vite
 
@@ -55,7 +136,6 @@ A full-stack task management application built with **React, TypeScript, Node.js
 - Node.js
 - Express.js
 - TypeScript
-- Zod
 - bcryptjs
 - express-rate-limit
 - cookie-parser
@@ -64,37 +144,54 @@ A full-stack task management application built with **React, TypeScript, Node.js
 
 ### Database
 - PostgreSQL
-- pg (node-postgres)
+- node-postgres (`pg`)
 - SQL migrations
+
 
 ## Project Structure
 
-```text
 set-03-react-basics/
-├── public/
-├── src/
-│   ├── components/
-│   ├── hooks/
-│   ├── services/
-│   └── types/
-├── server/
-│   ├── docs/
-│   ├── migrations/
-│   ├── seeds/
-│   ├── src/
-│   │   ├── config/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── routes/
-│   │   ├── schemas/
-│   │   ├── scripts/
-│   │   ├── services/
-│   │   └── types/
-│   └── tests/
-├── .gitignore
-├── package.json
-└── README.md
-```
+|
+|-- public/                    # Original Vite public assets
+|
+|-- src/                       # Original Vite frontend
+|   |-- components/
+|   |-- hooks/
+|   |-- services/
+|   |-- types/
+|
+|-- next-app/                  # Next.js frontend
+|   |-- public/
+|   |-- src/
+|   |   |-- app/
+|   |   |   |-- login/
+|   |   |   |-- signup/
+|   |   |   |-- projects/
+|   |   |   |-- tasks/
+|   |   |   |-- settings/
+|   |-- package.json
+|
+|-- server/                    # Express backend
+|   |-- docs/
+|   |-- migrations/
+|   |-- seeds/
+|   |-- src/
+|   |   |-- config/
+|   |   |-- controllers/
+|   |   |-- middleware/
+|   |   |-- routes/
+|   |   |-- schemas/
+|   |   |-- scripts/
+|   |   |-- services/
+|   |   |-- types/
+|   |-- tests/
+|   |-- package.json
+|
+|-- .gitignore
+|-- package.json               # Original Vite frontend
+|-- README.md
+|-- README-backup.md
+
 
 ## Getting Started
 
@@ -274,6 +371,8 @@ Permissions are enforced on the backend, not just through frontend controls.
 - Database indexes for query optimization
 - Transactional operations
 - Audit logging
+
+
 
 ## SQL Injection Prevention
 
