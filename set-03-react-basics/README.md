@@ -1,140 +1,140 @@
 # React Task Board
 
-A full-stack task management application built with **React, TypeScript, Node.js, Express.js, and PostgreSQL**. The application provides task management, project organization, user authentication, role-based access control, REST API integration, database migrations, and automated backend testing.
+A task management application built with React, TypeScript, Next.js, Node.js, Express, and PostgreSQL.
+
+The repository contains an original React + Vite frontend, a Next.js application, and an Express backend. The current task-board frontend is being developed in `next-app/`.
+
+The application supports authentication, project organization, task management, comments, and role-based access control.
 
 ## Features
 
-### Task Management
-- Create, edit, delete, and manage tasks
-- Move tasks between projects
-- Manage task statuses: To Do, In Progress, and Done
-- Search tasks by title
-- Filter tasks by status
-- Sort tasks by creation date
-- Pagination, filtering, sorting, and searching
-
 ### Authentication and Security
-- User registration and login
-- Secure password hashing using bcrypt
-- Session-based authentication using HTTP-only cookies
-- User logout and session revocation
-- Protected API routes
-- Forgot-password and password-reset functionality
-- Password reset tokens with expiration
+
+- User registration, login, and logout
+- Password hashing using bcrypt
+- Session-based authentication
+- HTTP-only authentication cookies
+- Protected routes and operations
+- Forgot-password and password-reset functionality in the Express backend
+- Password-reset tokens with expiration
 - Login and password-reset rate limiting
 - Password validation, including bcrypt's 72-byte limit
 - Cross-user data access protection
 
-### Project Authorization
+### Project Management
+
+- View and create projects
 - Project membership management
-- Role-based access control
 - Owner, member, and viewer roles
+- Role-based project access
 - Server-side permission enforcement
+
+### Task Management
+
+- Create, view, edit, and delete tasks
+- Move tasks between projects
+- Manage task statuses: To Do, In Progress, and Done
+- Mark tasks as completed
+- Search tasks by title
+- Filter tasks by status
+- Sort and paginate task results
+
+### Collaboration
+
+- Add and view task comments
+- Project-membership-based comment access
+- Viewers can read and post comments
 - Viewers cannot modify tasks
-- Users cannot access another user's protected project data
+- Owners and members can perform permitted task operations
 
-### Backend and Database
-- REST API integration
-- Request validation and centralized error handling
-- PostgreSQL database integration
-- Database migrations and seed scripts
-- Transactional database operations
-- Parameterized SQL queries
-- Audit logging
-- Automated backend tests
+### User Experience
 
-## Current Application Architecture
+- Loading and pending states
+- Form validation and error feedback
+- Custom 404 page
+- Route-level error boundaries
+- Server-side authentication and data fetching
 
-The repository contains the original React + Vite frontend, a newer Next.js frontend, and the Express.js backend.
+## Application Architecture
 
-The current Task Board frontend is being developed in the `next-app/` directory.
+### Next.js Application
 
-### Next.js Frontend
+The current frontend is located in `next-app/`.
 
-The Next.js application is built using:
+It uses the Next.js App Router and includes:
 
-- Next.js 16
-- React 19
-- TypeScript
-- Tailwind CSS
-- PostgreSQL integration
+- React Server Components for server-side rendering and data fetching
+- Client Components for interactive forms and browser-side behavior
+- Server Actions for data mutations
+- Server-side PostgreSQL access
+- Authentication and authorization checks on the server
 
-The frontend provides authentication, project management, task management, and user settings.
+The Next.js application handles its database operations through server-side services and Server Actions.
 
-### Next.js Application Routes
+### Express Backend
+
+The Express backend is located in `server/`.
+
+It provides a REST API with authentication, task operations, request validation, centralized error handling, PostgreSQL integration, and automated API tests.
+
+The Express backend is maintained separately from the Next.js application.
+
+### Original React + Vite Frontend
+
+The original React + Vite frontend is located at the repository root.
+
+It is retained separately from the newer Next.js application.
+
+## Next.js Routes
 
 | Route | Description |
 |---|---|
 | `/` | Home page |
 | `/login` | User login |
 | `/signup` | User registration |
-| `/projects` | View projects |
+| `/projects` | View available projects |
 | `/projects/new` | Create a project |
-| `/projects/[projectId]` | View project details |
+| `/projects/[projectId]` | View project details and tasks |
 | `/projects/[projectId]/tasks/new` | Create a task |
-| `/tasks/[taskId]` | View task details |
+| `/tasks/[taskId]` | View task details and comments |
 | `/settings` | User settings |
 
-### Frontend Development
+## Server and Browser Responsibilities
 
-Navigate to the Next.js application:
+### Server-side responsibilities
 
-```bash
-cd next-app
-npm install
-npm run dev
-```
+- Authenticate the current user
+- Fetch projects, tasks, and comments
+- Check project membership and permissions
+- Validate submitted data
+- Perform database operations
+- Revalidate pages after data changes
+- Handle missing resources and access restrictions
 
-The development server displays the local URL in the terminal.
+### Browser-side responsibilities
 
-### Frontend TypeScript Validation
+- Display rendered page content
+- Handle navigation
+- Provide interactive forms
+- Display validation errors and pending states
+- Allow users to submit comments and task updates
 
-```bash
-npx tsc --noEmit
-```
+This architecture keeps authentication, authorization, and database operations on the server while providing interactive user experiences through Client Components.
 
-### Frontend Production Build
-
-```bash
-npm run build
-```
-
-### Start the Production Server
-
-```bash
-npm run start
-```
-
-### Original React + Vite Frontend
-
-The repository also contains the original React + Vite frontend at the project root.
-
-It uses React, TypeScript, and Vite.
-
-The root-level frontend can be started using:
-
-```bash
-npm install
-npm run dev
-```
-
-The original Vite frontend is retained separately from the newer Next.js application.
-
-
-## Technologies Used
-
+## Technology Stack
 
 ### Frontend
-- React 19
-- Next.js 16
+
+- Next.js
+- React
 - TypeScript
 - Tailwind CSS
-- CSS
-- Vite
+- Vite for the original frontend
 
 ### Backend
+
 - Node.js
-- Express.js
+- Express
 - TypeScript
 - bcryptjs
 - express-rate-limit
@@ -143,32 +143,29 @@ The original Vite frontend is retained separately from the newer Next.js applica
 - Supertest
 
 ### Database
+
 - PostgreSQL
 - node-postgres (`pg`)
 - SQL migrations
-
+- Database seed scripts
 
 ## Project Structure
 
+```text
 set-03-react-basics/
 |
-|-- public/                    # Original Vite public assets
-|
-|-- src/                       # Original Vite frontend
+|-- src/                       # Original React + Vite frontend
 |   |-- components/
 |   |-- hooks/
 |   |-- services/
 |   |-- types/
 |
-|-- next-app/                  # Next.js frontend
+|-- next-app/                  # Current Next.js application
 |   |-- public/
 |   |-- src/
 |   |   |-- app/
-|   |   |   |-- login/
-|   |   |   |-- signup/
-|   |   |   |-- projects/
-|   |   |   |-- tasks/
-|   |   |   |-- settings/
+|   |   |-- components/
+|   |   |-- lib/
 |   |-- package.json
 |
 |-- server/                    # Express backend
@@ -181,25 +178,22 @@ set-03-react-basics/
 |   |   |-- middleware/
 |   |   |-- routes/
 |   |   |-- schemas/
-|   |   |-- scripts/
 |   |   |-- services/
-|   |   |-- types/
 |   |-- tests/
 |   |-- package.json
 |
-|-- .gitignore
 |-- package.json               # Original Vite frontend
 |-- README.md
-|-- README-backup.md
-
+```
 
 ## Getting Started
 
 ### Prerequisites
 
-Make sure you have the following installed:
+Install the following:
 
-- Node.js and npm
+- Node.js
+- npm
 - PostgreSQL
 - Git
 
@@ -210,26 +204,37 @@ git clone https://github.com/sai-sreeja-a/react-task-board.git
 cd react-task-board
 ```
 
-### 2. Install Frontend Dependencies
-
-From the project root:
+### 2. Set Up the Next.js Application
 
 ```bash
+cd next-app
 npm install
 ```
 
-### 3. Install Backend Dependencies
+Create a `.env.local` file in the `next-app/` directory and configure the PostgreSQL connection and any other required environment variables.
+
+Use the variable names expected by the application's database configuration.
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Open the local URL displayed in the terminal.
+
+### 3. Set Up the Express Backend
+
+Open another terminal from the repository root:
 
 ```bash
 cd server
 npm install
 ```
 
-### 4. Configure Environment Variables
+Create a `.env` file in the `server/` directory and configure your local PostgreSQL connection.
 
-Create a `.env` file inside the `server` directory.
-
-Add your local PostgreSQL configuration:
+Example:
 
 ```env
 PGHOST=localhost
@@ -240,25 +245,25 @@ PGPASSWORD=your_local_password
 PGTESTDATABASE=task_tracker_test_db
 ```
 
-Replace the values with your own PostgreSQL configuration.
+Replace these values with your own PostgreSQL configuration.
 
-**Important:** Never commit your `.env` file or expose database credentials on GitHub.
+Never commit `.env` files or expose database credentials.
 
-### 5. Run Database Migrations
+### 4. Run Backend Database Migrations
 
-From the `server` directory:
+From the `server/` directory:
 
 ```bash
 npm run migrate
 ```
 
-### 6. Seed the Database
+### 5. Seed the Backend Database
 
 ```bash
 npm run seed
 ```
 
-### 7. Start the Backend
+### 6. Start the Express Backend
 
 ```bash
 npm run dev
@@ -266,29 +271,55 @@ npm run dev
 
 The backend runs at:
 
-`http://localhost:5000`
-
-### 8. Start the Frontend
-
-Open another terminal, navigate to the project root, and run:
-
-```bash
-npm run dev
+```text
+http://localhost:5000
 ```
 
-Vite displays the frontend's local URL in the terminal.
+The Next.js application and Express backend are separate applications. Start each one from its own directory when working with both.
 
-## API Documentation
+## Next.js Validation and Production Build
 
-Base URL:
+Run these commands from `next-app/`.
 
-`http://localhost:5000/api`
+### TypeScript Validation
+
+```bash
+npx tsc --noEmit
+```
+
+### Lint
+
+```bash
+npm run lint
+```
+
+### Production Build
+
+```bash
+npm run build
+```
+
+### Start the Production Server
+
+```bash
+npm run start
+```
+
+Build the application before starting the production server.
+
+## Express API Documentation
+
+The Express API base URL is:
+
+```text
+http://localhost:5000/api
+```
 
 ### Authentication Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/auth/signup` | Register a new user |
+| POST | `/auth/signup` | Register a user |
 | POST | `/auth/login` | Authenticate a user |
 | POST | `/auth/logout` | Log out and revoke the session |
 | GET | `/auth/me` | Retrieve the authenticated user |
@@ -297,20 +328,20 @@ Base URL:
 
 Authentication uses HTTP-only session cookies. Protected endpoints require a valid session.
 
-**Password reset note:** In the current development implementation, the reset link is logged to the server console. Production email delivery requires an email provider integration.
+In the current development implementation, password-reset links are logged to the server console. Production email delivery requires an email provider integration.
 
 ### Task Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
 | GET | `/tasks` | Retrieve tasks |
-| GET | `/tasks/:id` | Retrieve a task by ID |
-| POST | `/tasks` | Create a new task |
-| PUT | `/tasks/:id` | Update an existing task |
+| GET | `/tasks/:id` | Retrieve a task |
+| POST | `/tasks` | Create a task |
+| PUT | `/tasks/:id` | Update a task |
 | DELETE | `/tasks/:id` | Delete a task |
 | PATCH | `/tasks/:id/move` | Move a task to another project |
 
-### Query Parameters
+### Task Query Parameters
 
 | Parameter | Description |
 |---|---|
@@ -330,33 +361,34 @@ GET /api/tasks?page=1&limit=10&status=todo&sortBy=createdAt&order=desc
 ## Authentication and Authorization
 
 ### Password Security
+
 - Passwords are hashed using bcrypt before database storage.
-- Passwords are never stored as plain text.
-- Passwords must contain at least 8 characters.
-- Passwords are limited to 72 bytes to respect bcrypt's input limit.
+- Plain-text passwords are not stored.
+- Passwords must meet the application's validation requirements.
+- Password length is limited to bcrypt's 72-byte input limit.
 
 ### Session Security
-- Authentication uses randomly generated session tokens.
-- Session tokens are stored as SHA-256 hashes in the database.
+
+- Session tokens are randomly generated.
+- Session tokens are stored as hashes in the database.
 - Sessions have expiration dates.
-- HTTP-only cookies help protect session tokens from JavaScript access.
+- HTTP-only cookies help prevent JavaScript access to session tokens.
 - Logging out revokes the current session.
-- Password resets revoke existing user sessions.
+- Password resets revoke existing sessions.
 
-### Role-Based Access Control
-
-The application supports three project roles:
+### Project Roles
 
 | Role | Permissions |
 |---|---|
 | Owner | Full project management permissions |
 | Member | Project access and permitted task operations |
-| Viewer | Read-only access |
+| Viewer | Read-only task access; can participate in comments |
 
-Permissions are enforced on the backend, not just through frontend controls.
+Permissions are enforced on the server, not only through frontend controls.
 
 ### Rate Limiting
-- Login attempts are limited to help prevent brute-force attacks.
+
+- Login attempts are rate limited.
 - Password-reset requests are rate limited.
 - Password-reset responses avoid revealing whether an email address is registered.
 
@@ -364,30 +396,26 @@ Permissions are enforced on the backend, not just through frontend controls.
 
 - Relational database schema
 - Users, projects, project memberships, tasks, comments, and tags
-- User sessions and password-reset tokens
+- User sessions and password-reset tokens in the Express backend
 - Versioned SQL migrations
 - Database seed scripts
 - Parameterized SQL queries
-- Database indexes for query optimization
+- Database indexes
 - Transactional operations
 - Audit logging
 
-
-
 ## SQL Injection Prevention
 
-Database queries use parameterized SQL statements to help prevent SQL injection attacks.
+Database queries use parameterized SQL statements to help prevent SQL injection.
 
-**Unsafe example (do not use):**
+Unsafe example:
 
 ```ts
 const query = `SELECT * FROM tasks WHERE id = ${id}`;
 const result = await pool.query(query);
 ```
 
-Directly inserting user input into SQL queries can allow malicious input to alter the query.
-
-**Safe example:**
+Safe example:
 
 ```ts
 const result = await pool.query(
@@ -396,21 +424,33 @@ const result = await pool.query(
 );
 ```
 
-Parameterized queries keep user-provided values separate from SQL query structure.
+Parameterized queries keep user-provided values separate from the SQL query structure.
 
 ## Automated Testing
 
-Backend tests use Jest and Supertest.
+The Express backend uses Jest and Supertest.
 
-From the `server` directory, run:
+From the `server/` directory, run:
 
 ```bash
 npm test
 ```
 
-The backend currently has **34 passing automated tests** across two test suites.
+The backend test suite has **34 passing tests across two test suites**.
+
+### Authentication API Tests
+
+- User registration
+- Duplicate-email rejection
+- Invalid signup input
+- Password validation
+- Login and incorrect credentials
+- Logout and session revocation
+- Forgot-password response privacy
+- Password reset and session revocation
 
 ### Task API Tests
+
 - Task CRUD operations
 - Request validation
 - Invalid IDs
@@ -419,37 +459,33 @@ The backend currently has **34 passing automated tests** across two test suites.
 - Viewer permission enforcement
 - Expired-session protection
 
-### Authentication API Tests
-- User registration
-- Duplicate-email rejection
-- Invalid signup input
-- Password length validation
-- Login and incorrect credentials
-- Logout and session revocation
-- Forgot-password response privacy
-- Password reset and session revocation
-
 ### Test Results
 
 - Authentication tests: 8 passed
 - Task API tests: 26 passed
 - Total: 34 passed
 
+The Next.js application has also been validated separately using TypeScript checks, linting, a production build, and manual permission testing.
+
 ## Production Build
 
-### Frontend
+### Next.js Frontend
 
-From the project root:
+From `next-app/`:
 
 ```bash
 npm run build
 ```
 
-This runs the TypeScript build and creates the production frontend bundle using Vite.
+Start the production server:
 
-### Backend
+```bash
+npm run start
+```
 
-From the `server` directory:
+### Express Backend
+
+From `server/`:
 
 ```bash
 npm run build
@@ -471,10 +507,12 @@ Additional database documentation is available in `server/docs/`, including:
 - React state management and hooks
 - TypeScript interfaces and types
 - Reusable component architecture
-- Custom hooks
+- Next.js App Router
+- Server Components and Client Components
+- Server Actions
 - REST API integration
 - Backend development with Express
-- User authentication and session management
+- Authentication and session management
 - Password security and rate limiting
 - Role-based access control
 - PostgreSQL schema design
